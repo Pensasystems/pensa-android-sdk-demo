@@ -6,9 +6,10 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.pensasystems.pensasdk.PensaSdk
 import com.pensasystems.shelfxpert.databinding.ActivityMainBinding
 import com.pensasystems.shelfxpert.databinding.DialogGlobalstoreBinding
-import com.pensasystems.pensasdk.PensaSdk
+import com.pensasystems.shelfxpert.databinding.DialogScanAreaBinding
 
 
 class MainActivity : AppCompatActivity() {
@@ -22,9 +23,13 @@ class MainActivity : AppCompatActivity() {
 
         binding.c1.setOnClickListener {
             if (!shouldInitPensa()) {
-                PensaSdk.displaySearchStore(this, onError = {
+                PensaSdk.showShelfScans(this, onError = {
                     runOnUiThread {
-                        Toast.makeText(this, "Error occured when searching stores", Toast.LENGTH_LONG).show()
+                        Toast.makeText(
+                            this,
+                            "Error occured when show shelf scans",
+                            Toast.LENGTH_LONG
+                        ).show()
                     }
                 })
             }
@@ -32,9 +37,13 @@ class MainActivity : AppCompatActivity() {
 
         binding.c2.setOnClickListener {
             if (!shouldInitPensa()) {
-                PensaSdk.monitorUploads(this, onError = {
+                PensaSdk.showProductScans(this, onError = {
                     runOnUiThread {
-                        Toast.makeText(this, "Error occured when monitoring uploads", Toast.LENGTH_LONG).show()
+                        Toast.makeText(
+                            this,
+                            "Error occured when show product scans",
+                            Toast.LENGTH_LONG
+                        ).show()
                     }
                 })
             }
@@ -42,10 +51,12 @@ class MainActivity : AppCompatActivity() {
 
         binding.c3.setOnClickListener {
             if (!shouldInitPensa()) {
-                PensaSdk.displayRecentlyVisitedStores(this, onError = {
+                PensaSdk.showStoreSearchView(this, onError = {
                     runOnUiThread {
                         Toast.makeText(
-                            this@MainActivity, "Error occured when launching recent visits screen.", Toast.LENGTH_LONG
+                            this@MainActivity,
+                            "Error occured when show store search view.",
+                            Toast.LENGTH_LONG
                         ).show()
                     }
                 })
@@ -53,6 +64,61 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.c4.setOnClickListener {
+            if (!shouldInitPensa()) {
+                PensaSdk.showStoresScreen(this, onError = {
+                    runOnUiThread {
+                        Toast.makeText(
+                            this@MainActivity,
+                            "Error occured when show store screen.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                })
+            }
+        }
+
+        binding.c5.setOnClickListener {
+            if (!shouldInitPensa()) {
+                val dialogBinding = DialogScanAreaBinding.inflate(layoutInflater)
+                MaterialAlertDialogBuilder(this)
+                    .setTitle("Enter Scan Area Details")
+                    .setView(dialogBinding.root)
+                    .setPositiveButton("Submit") { _, _ ->
+                        val scanAreaId = dialogBinding.scanAreaIdEditText.text?.toString()
+                        if (scanAreaId?.isNotEmpty() == true) {
+                            PensaSdk.showScanArea(
+                                this,
+                                scanAreaId.toInt(),
+                                onError = {
+                                    runOnUiThread {
+                                        Toast.makeText(this, it, Toast.LENGTH_LONG).show()
+                                    }
+                                })
+                        } else {
+                            Toast.makeText(this, "Scan Area Id cannot be empty", Toast.LENGTH_SHORT)
+                                .show()
+                        }
+                    }
+                    .setNegativeButton("Cancel", null)
+                    .show()
+            }
+        }
+
+        binding.c6.setOnClickListener {
+            if (!shouldInitPensa()) {
+                PensaSdk.showStockingScreen(this, onError = {
+                    runOnUiThread {
+                        Toast.makeText(
+                            this@MainActivity,
+                            "Error occured when show stocking screen.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                })
+            }
+        }
+
+        binding.c7.setOnClickListener {
             if (!shouldInitPensa()) {
                 val dialogBinding = DialogGlobalstoreBinding.inflate(layoutInflater)
                 MaterialAlertDialogBuilder(this)
@@ -63,18 +129,22 @@ class MainActivity : AppCompatActivity() {
                         val sectionKey = dialogBinding.categoryIdEditText.text?.toString()
                         val guid = dialogBinding.guidEditText.text?.toString()
                         if (globalStoreId?.isNotEmpty() == true) {
-                            PensaSdk.displayStoreById(
+                            PensaSdk.showStoreChecklist(
                                 this,
-                                sectionKey,
-                                guid,
                                 globalStoreId,
+                                guid,
+                                sectionKey,
                                 onError = {
                                     runOnUiThread {
                                         Toast.makeText(this, it, Toast.LENGTH_LONG).show()
                                     }
                                 })
                         } else {
-                            Toast.makeText(this, "GlobalStoreId cannot be empty", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                this,
+                                "GlobalStoreId cannot be empty",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     }
                     .setNegativeButton("Cancel", null)
