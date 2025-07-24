@@ -3,9 +3,8 @@
 package com.pensasystems.shelfxpert
 
 import android.app.Application
-import com.pensasystems.pensasdk.PensaConfiguration
+import com.pensasystems.pensasdk.PensaSdkConfiguration
 import com.pensasystems.pensasdk.PensaSdk
-import com.pensasystems.pensasdk.listener.CallbackError
 import com.pensasystems.pensasdk.listener.CantScanEventListener
 import com.pensasystems.pensasdk.listener.ScanUploadListener
 
@@ -14,7 +13,7 @@ class ShelfXpertApp : Application(), ScanUploadListener, CantScanEventListener {
     override fun onCreate() {
         super.onCreate()
 
-        val config = PensaConfiguration.Builder()
+        val config = PensaSdkConfiguration.Builder()
             .setClientId(BuildConfig.CLIENT_ID)
             .setClientSecret(BuildConfig.CLIENT_SECRET)
             .setScanUploadListener(this)
@@ -25,7 +24,7 @@ class ShelfXpertApp : Application(), ScanUploadListener, CantScanEventListener {
 
         PensaSdk.initPensa(
             applicationContext = this,
-            configuration = config,
+            sdkConfiguration = config,
             onSuccess = { println("Configured successfully") },
             onError = { println(it) }
         )
@@ -45,9 +44,8 @@ class ShelfXpertApp : Application(), ScanUploadListener, CantScanEventListener {
     override fun onScanUploadFailed(
         tdlinxId: String,
         scanAreaId: String,
-        error: CallbackError
     ) {
-        println("Upload failed: tdlinxId: $tdlinxId | scanAreaId: $scanAreaId | Error: ${error.code} - ${error.message}")
+        println("Upload failed: tdlinxId: $tdlinxId | scanAreaId: $scanAreaId")
     }
 
     override fun onCantScanReported(tdlinxId: String, scanAreaId: String, cantScanReason: String) {
